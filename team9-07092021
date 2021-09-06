@@ -14,3 +14,155 @@ from datetime import datetime
 
 
 
+
+
+st.write('''#Stock Market Web App''')
+image = Image.open("C:/Users/hriku/Downloads/images.jpg")
+st.image(image, use_column_width=True)
+st.sidebar.header('User Input')
+
+
+def get_input():
+    start_date = st.sidebar.text_input("StartDate", "2021-01-04")
+    end_date = st.sidebar.text_input("EndDate", "2021-08-25")
+    stock_symbol = st.sidebar.text_input("Stock Symbol", "AAPL")
+    return start_date, end_date, stock_symbol
+
+
+def get_company_name(symbol):
+    if symbol == "AAPL":
+        return "Apple"
+    elif symbol == "MSFT":
+        return "Microsoft"
+    elif symbol == "GOOGL":
+        return "Google"
+    elif symbol == "ADSK":
+        return "Anydesk"
+    elif symbol == "AMZN":
+        return "Amazon"
+    elif symbol == "FB":
+        return "Facebook"
+    elif symbol == "TSLA":
+        return "Tesla"
+    elif symbol == "TSM":
+        return "Team"
+    elif symbol == "NVDA":
+        return "Nevdia"
+    else:
+        return "error"
+
+def get_data(symbol, start_date, end_date):
+    if symbol.upper()=='AAPL':
+        df = pd.read_csv("C:/Users/hriku/Downloads/AAPL.csv")
+    elif symbol.upper()=='MSFT':
+        df = pd.read_csv("C:/Users/hriku/Downloads/MSFT.csv")
+    elif symbol.upper()=='TSLA':
+        df = pd.read_csv("C:/Users/hriku/Downloads/TSLA.csv")
+    elif symbol.upper()=='ADSK':
+        df = pd.read_csv("C:/Users/hriku/Downloads/ADSK.csv")
+    elif symbol.upper()=='FB':
+        df = pd.read_csv("C:/Users/hriku/Downloads/FB.csv")
+    elif symbol.upper()=='AMZN':
+        df = pd.read_csv("C:/Users/hriku/Downloads/AMZN.csv")
+    else:
+        df = pd.DataFrame(columns = ['close','high','low','open','symbol','volume'])
+
+    start = pd.to_datetime(start_date)
+    end = pd.to_datetime(end_date)
+
+    start_row = 0
+    end_row = 0
+    for i in range(0, len(df)):
+        if start <= pd.to_datetime(df['date'][i]):
+            start_row = i
+            break
+    for j in range(0, len(df)):
+        if end >= pd.to_datetime(df['date'][len(df) - 1 - j]):
+            end_row = len(df) - 1 - j
+            break
+
+    df = df.set_index(pd.DatetimeIndex(df["date"].values))
+    return df.iloc[start_row:end_row + 1, :]
+
+
+start, end, symbol = get_input()
+
+df = get_data(symbol, start, end)
+company_name = get_company_name(symbol.upper())
+st.header(company_name + " Close Price\n")
+st.line_chart(df["close"])
+
+
+fig = go.Figure(data=[go.Candlestick(x=df['date'],
+                open=df['open'],
+                high=df['high'],
+                low=df['low'],
+                close=df['close'])]);
+
+fig.show()
+
+st.header(company_name + " VOLUME\n")
+st.line_chart(df["volume"])
+st.header('STATISTICAL DATA')
+st.write(df.describe())
+data = pd.DataFrame(df)
+X = list(df.iloc[:, 0])
+Y = list(df.iloc[:, 1])
+plt.bar(X, Y)
+plt.show()
+
+import matplotlib.pyplot as plt
+from mplfinance.original_flavor import candlestick_ohlc
+import pandas as pd
+import matplotlib.dates as mpdates
+
+plt.style.use('dark_background')
+
+# extracting Data for plotting
+df = pd.read_csv("C:/Users/hriku/Downloads/AAPL.csv")
+df = df[['date', 'open', 'high', 'low', 'close']]
+
+# convert into datetime object
+df['date'] = pd.to_datetime(df['date'])
+
+# apply map function
+df['date'] = df['date'].map(mpdates.date2num)
+
+# creating Subplots
+fig, ax = plt.subplots()
+
+# plotting the data
+candlestick_ohlc(ax, df.values, width = 0.6,
+				colorup = 'green', colordown = 'red',
+				alpha = 0.8)
+
+# allow grid
+ax.grid(True)
+
+# Setting labels
+ax.set_xlabel('Date')
+ax.set_ylabel('Price')
+
+# setting title
+plt.title('Prices For the Period 04-01-2021 to 25-08-2021')
+
+# Formatting Date
+date_format = mpdates.DateFormatter('%d-%m-%Y')
+ax.xaxis.set_major_formatter(date_format)
+fig.autofmt_xdate()
+
+fig.tight_layout()
+
+# show the plot
+plt.show()
+
+
+
+df = pd.read_csv(r"C:/Users/hriku/Downloads/AAPL.csv")
+
+
+
+
+#bar graph
+
+df = pd.read_csv(r"C:/Users/hriku/Downloads/AAPL.csv")
